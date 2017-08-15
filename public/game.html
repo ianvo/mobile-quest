@@ -1,0 +1,147 @@
+
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Test Room</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+        <script src="socket.io.js"></script>
+        <script src="phaser.min.js" type="text/javascript"></script>
+        <script src="vjoy.js"></script>
+        <script src="player.js" type="text/javascript"></script>
+        <style>
+            body {
+                margin: 0px;
+                padding: 0px;
+                font-family: Arial;
+                font-size: 14px;
+                background-color: #000000;
+                color: #fff;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="phaser-example"></div>
+
+        <script type="text/javascript">
+
+        
+    var socket = io();
+
+var game = new Phaser.Game('100%', '100%', Phaser.CANVAS, 'phaser-example', { preload: preload, init:init, create: create, update: update, render: render });
+
+function preload() {
+
+    //game.load.tilemap('map', 'catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
+    //game.load.image('tiles', 'catastrophi_tiles_16.png');
+    game.load.tilemap('map', 'world.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.spritesheet('tileset', 'tilesheet.png',32,32);
+    game.load.spritesheet('player', 'sprite_melee.png', 64, 64);
+    
+    game.load.image('vjoy_base', 'base.png');
+    game.load.image('vjoy_body', 'body.png');
+    game.load.image('vjoy_cap', 'cap.png');
+
+}
+
+var map;
+var layer;
+var pad;
+var stick;
+var buttonA;
+var collisionLayer;
+
+var playerId = undefined;
+var players = {};
+
+function init() {
+    game.renderer.renderSession.roundPixels = true;
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+    game.stage.disableVisibilityChange = true;
+}
+
+function create() {
+
+    pad = game.plugins.add(Phaser.Plugin.VJoy);
+    pad.inputEnable();
+    
+    map = game.add.tilemap('map');
+    map.addTilesetImage('tilesheet', 'tileset');
+    for(var i = 0; i < map.layers.length-1; i++) {
+        layer = map.createLayer(i);
+    }
+    collisionLayer = map.createLayer('no_walk');
+    collisionLayer.alpha=0;
+    game.physics.arcade.enable(collisionLayer);
+    game.add.existing(collisionLayer);
+    map.setCollisionByExclusion([0], true, collisionLayer);
+    layer.resizeWorld();
+
+    
+    socket.emit('createPlayer', "me");
+
+}
+
+socket.on('init', function(initPlayer){
+    playerId = initPlayer.id;
+    players[playerId] = new Player(game, playerId, true, initPlayer.x, initPlayer.y);
+});
+
+socket.on('allplayers', function(allPlayers){
+    for(var i in allPlayers) {
+        var player = allPlayers[i];
+
+        if(playerId != i) {
+            players[i] = new Player(game, i, false, player.x, player.y);
+        }
+    }
+});
+
+socket.on('newPlayer', function(newPlayer){
+    if(newPlayer.id != playerId) {
+        players[newPlayer.id] = new Player(game, newPlayer.id, false, newPlayer.x, newPlayer.y);
+    }
+});
+
+socket.on('playerQuit', function(player) {
+    if(players[player] != undefined) {
+        players[player].remove();
+        delete players[player];
+    }
+});
+
+socket.on('updatePositions', function(updatePlayers) {
+    //console.log(JSON.stringify(updatePlayers));
+    for(var i in updatePlayers) {
+        var player = updatePlayers[i];
+
+        if(playerId != i && players[i] != undefined) {
+            if(player.x != players[i].entity.body.x && player.y != players[i].entity.body.y) {
+                players[i].setTarget(player.x, player.y);
+            }
+        }
+    }
+});
+
+function update() {
+    for(var i in players) {
+        player = players[i];
+        players[i].update(collisionLayer, pad.rotation, pad.isDown ? 1 : 0);
+
+        if(playerId == i) {
+            socket.emit('currentPosition', {id:playerId, x:player.entity.body.x, y:player.entity.body.y});
+        }
+    }
+}
+
+function render() {
+
+    // game.debug.body(player);
+    
+}
+        
+        </script>
+
+    </body>
+</html>
