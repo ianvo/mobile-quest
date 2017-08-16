@@ -20,7 +20,7 @@ io.on('connection', function(socket){
 
     socket.on('createPlayer', function(playerInfo) {
         //var player = new PlayerModule.Player(socket.id, playerInfo[0], false, Math.random()*3000, Math.random()*1500, '#'+Math.floor(Math.random()*16777215).toString(16), playerInfo[1]);
-        players[socket.id] = {id: socket.id, x:48, y:258};
+        players[socket.id] = {id: socket.id, x:48, y:258, moving: false};
         socket.emit('init', players[socket.id]);
         socket.emit('allplayers', players);
         io.sockets.emit('newPlayer', players[socket.id]);

@@ -120,6 +120,7 @@ socket.on('updatePositions', function(updatePlayers) {
             if(player.x != players[i].entity.body.x && player.y != players[i].entity.body.y) {
                 players[i].setTarget(player.x, player.y);
             }
+            players[i].isMoving = player.isMoving;
         }
     }
 });
@@ -130,7 +131,7 @@ function update() {
         players[i].update(collisionLayer, pad.rotation, pad.isDown ? 1 : 0);
 
         if(playerId == i) {
-            socket.emit('currentPosition', {id:playerId, x:player.entity.body.x, y:player.entity.body.y});
+            socket.emit('currentPosition', {id:playerId, x:player.entity.body.x, y:player.entity.body.y, isMoving:pad.isDown});
         }
     }
 }

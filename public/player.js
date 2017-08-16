@@ -7,7 +7,7 @@ var Player = function(context, name, isMe, x, y) {
     this.entity.animations.add('down', [131,132,133,134,135,136,137,138], 15, true);
     this.entity.animations.add('right', [144,145,146,147,148,149,150,151], 15, true);
     this.maxSpeed = 175;
-    
+    this.isMoving = false;
 
     game.physics.enable(this.entity, Phaser.Physics.ARCADE);
 
@@ -45,11 +45,12 @@ Player.prototype = {
     },
   
     update: function(world, rotation, force) {
+        moving = force != 0;
         if(!this.isMe) {
           var currentPoint = new Phaser.Point(this.entity.body.x, this.entity.body.y);
           rotation = this.rotation;
           force = 1;
-          
+          moving = this.isMoving;
           
           var newRemainderDistance = this.targetPoint.distance(currentPoint);
           if(newRemainderDistance >= this.remainderDistance && this.remainderDistance >= 0) {
@@ -71,7 +72,7 @@ Player.prototype = {
             var vel = force * this.maxSpeed;
             this.entity.body.velocity.x = Math.cos(rotation) * vel;
             this.entity.body.velocity.y = Math.sin(rotation) * vel;
-            
+
             if(rotation >= -Math.PI / 4 && rotation <= Math.PI / 4) {
                 this.entity.play('right');
             }
@@ -85,7 +86,7 @@ Player.prototype = {
                 this.entity.play('down');
             }
         }
-        else
+        else if (!moving)
         {
             this.entity.animations.stop();
         }
