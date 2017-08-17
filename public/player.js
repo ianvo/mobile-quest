@@ -19,6 +19,8 @@ var Player = function(context, name, isMe, x, y) {
     this.targetPoint = new Phaser.Point(this.entity.body.x, this.entity.body.y);
     this.remainderDistance = -1;
     this.rotation = Math.PI/2;
+    this.lastPosition = this.startPoint;
+    this.distanceSinceLastFootstep = 0;
     
     this.name = game.add.text(this.entity.body.x, this.entity.body.y, name, { font: '11px Arial', fill: '#ffffff' });
 
@@ -43,11 +45,17 @@ Player.prototype = {
         }
       
     },
+
+    bringToTop: function() {
+        this.name.bringToTop();
+        this.entity.bringToTop();
+    },
   
     update: function(world, rotation, force) {
         moving = force != 0;
+
+        var currentPoint = new Phaser.Point(this.entity.body.x, this.entity.body.y); 
         if(!this.isMe) {
-          var currentPoint = new Phaser.Point(this.entity.body.x, this.entity.body.y);
           rotation = this.rotation;
           force = 1;
           moving = this.isMoving;
@@ -62,7 +70,6 @@ Player.prototype = {
           }
           this.remainderDistance = newRemainderDistance;
         }
-      
         else {
           game.physics.arcade.collide(this.entity, world);
         }
@@ -92,6 +99,17 @@ Player.prototype = {
         }
         this.name.x = this.entity.body.x-((this.name.width-this.entity.body.width)/2);
         this.name.y = this.entity.body.y+this.entity.body.height;
+
+
+        var distanceTravelled = this.lastPosition.distance(currentPoint);
+        this.distanceSinceLastFootstep += distanceTravelled;
+        this.lastPosition = currentPoint;
+        if(this.distanceSinceLastFootstep > 30) {
+            var footprintX = this.entity.body.x+    (this.entity.body.width/2);
+            var footPrintY = this.entity.body.y+this.entity.body.height-15;
+            footprints.push(new Footprint(this.game, footprintX, footPrintY, rotation));
+            this.distanceSinceLastFootstep = 0;
+        }
     }
 };
 
