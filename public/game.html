@@ -88,11 +88,11 @@ function create() {
     map.setCollisionByExclusion([0], true, collisionLayer);
     aboveLayer.resizeWorld();
 
-    button = game.add.button(game.width - 200, game.height-75, 'chat_button', openChat, this, 0, 0, 1, 0);
+    button = game.add.button(game.width - 150, game.height-130, 'chat_button', openChat, this, 0, 0, 1, 0);
     button.fixedToCamera = true;
 
     pad = game.plugins.add(Phaser.Plugin.VJoy);
-    pad.inputEnable(pad.settings.maxDistanceInPixels+40, game.height-(pad.settings.maxDistanceInPixels+40));
+    pad.inputEnable(pad.settings.maxDistanceInPixels+40, game.height-(pad.settings.maxDistanceInPixels+60));
     
     socket.emit('createPlayer', "me");
 
