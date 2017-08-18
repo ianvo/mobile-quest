@@ -92,7 +92,7 @@ function create() {
     button.fixedToCamera = true;
 
     pad = game.plugins.add(Phaser.Plugin.VJoy);
-    pad.inputEnable(pad.settings.maxDistanceInPixels+20, game.height-(pad.settings.maxDistanceInPixels+20));
+    pad.inputEnable(pad.settings.maxDistanceInPixels+40, game.height-(pad.settings.maxDistanceInPixels+40));
     
     socket.emit('createPlayer', "me");
 
