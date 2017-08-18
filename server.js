@@ -18,9 +18,9 @@ var players = {};
 io.on('connection', function(socket){
     console.log('new user: ' + socket.id);
 
-    socket.on('createPlayer', function(playerInfo) {
+    socket.on('createPlayer', function(playerName) {
         //var player = new PlayerModule.Player(socket.id, playerInfo[0], false, Math.random()*3000, Math.random()*1500, '#'+Math.floor(Math.random()*16777215).toString(16), playerInfo[1]);
-        players[socket.id] = {id: socket.id, x:48, y:258, moving: false};
+        players[socket.id] = {id: socket.id, n:playerName, x:48, y:258, isMoving: false};
         socket.emit('init', players[socket.id]);
         socket.emit('allplayers', players);
         io.sockets.emit('newPlayer', players[socket.id]);
@@ -35,7 +35,9 @@ io.on('connection', function(socket){
     socket.on('currentPosition', function(player){
         //console.log(player.id + ": " + player.x + " " + player.y);
         if(players[socket.id] != undefined) {
-            players[socket.id] = player;
+            players[socket.id].x = player.x;
+            players[socket.id].y = player.y;
+            players[socket.id].isMoving = player.isMoving;
         }
     });
 

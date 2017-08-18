@@ -29,8 +29,12 @@
 
         
     var socket = io();
+    
+    var name = prompt("Enter your name", "Anon");
+    if(name) {
+        var game = new Phaser.Game('100%', '100%', Phaser.CANVAS, 'phaser-example', { preload: preload, init:init, create: create, update: update, render: render });
+    }
 
-var game = new Phaser.Game('100%', '100%', Phaser.CANVAS, 'phaser-example', { preload: preload, init:init, create: create, update: update, render: render });
 
 function preload() {
 
@@ -93,18 +97,20 @@ function create() {
 
     pad = game.plugins.add(Phaser.Plugin.VJoy);
     pad.inputEnable(pad.settings.maxDistanceInPixels+40, game.height-(pad.settings.maxDistanceInPixels+60));
-    
-    socket.emit('createPlayer', "me");
+    socket.emit('createPlayer', name);
 
 }
 
 function openChat() {
-    socket.emit('message', 'huehuehue');
+    var message = prompt("Enter your message", "");
+    if(message) {
+        socket.emit('message', message);
+    }
 }
 
 socket.on('init', function(initPlayer){
     playerId = initPlayer.id;
-    players[playerId] = new Player(game, playerId, true, initPlayer.x, initPlayer.y);
+    players[playerId] = new Player(game, initPlayer.n, true, initPlayer.x, initPlayer.y);
 });
 
 socket.on('allplayers', function(allPlayers){
@@ -112,14 +118,15 @@ socket.on('allplayers', function(allPlayers){
         var player = allPlayers[i];
 
         if(playerId != i) {
-            players[i] = new Player(game, i, false, player.x, player.y);
+            console.log(JSON.stringify(player));
+            players[i] = new Player(game, player.n, false, player.x, player.y);
         }
     }
 });
 
 socket.on('newPlayer', function(newPlayer){
     if(newPlayer.id != playerId) {
-        players[newPlayer.id] = new Player(game, newPlayer.id, false, newPlayer.x, newPlayer.y);
+        players[newPlayer.id] = new Player(game, newPlayer.n, false, newPlayer.x, newPlayer.y);
     }
 });
 
@@ -158,7 +165,7 @@ function update() {
         players[i].update(collisionLayer, pad.rotation, pad.isDown ? 1 : 0, dt);
 
         if(playerId == i) {
-            socket.emit('currentPosition', {id:playerId, x:player.entity.body.x, y:player.entity.body.y, isMoving:pad.isDown});
+            socket.emit('currentPosition', {x:player.entity.body.x, y:player.entity.body.y, isMoving:pad.isDown});
             me = player;
         }
         player.bringToTop();
