@@ -39,6 +39,10 @@ io.on('connection', function(socket){
         }
     });
 
+    socket.on('message', function(message) {
+        io.sockets.emit('message', {id:socket.id, m:message});
+    })
+
 });
 
 var prevTime = (new Date()).getTime();

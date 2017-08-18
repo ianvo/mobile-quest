@@ -33,12 +33,6 @@
 var game = new Phaser.Game('100%', '100%', Phaser.CANVAS, 'phaser-example', { preload: preload, init:init, create: create, update: update, render: render });
 
 function preload() {
-    game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
-    game.scale.pageAlignHorizontally = true;
-    game.scale.pageAlignVertically = true;
-    game.scale.forceLandscape = true;
-    game.scale.parentIsWindow = true;
-    game.scale.refresh();
 
     //game.load.tilemap('map', 'catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
     //game.load.image('tiles', 'catastrophi_tiles_16.png');
@@ -105,7 +99,7 @@ function create() {
 }
 
 function openChat() {
-    console.log("open chat");
+    socket.emit('message', 'huehuehue');
 }
 
 socket.on('init', function(initPlayer){
@@ -136,6 +130,12 @@ socket.on('playerQuit', function(player) {
     }
 });
 
+socket.on('message', function(message) {
+    if(players[message.id] != undefined) {
+        players[message.id].setMessage(message.m);
+    }
+});
+
 socket.on('updatePositions', function(updatePlayers) {
     //console.log(JSON.stringify(updatePlayers));
     for(var i in updatePlayers) {
@@ -151,10 +151,11 @@ socket.on('updatePositions', function(updatePlayers) {
 });
 
 function update() {
+    var dt = game.time.elapsed;
     var me = undefined;
     for(var i in players) {
         player = players[i];
-        players[i].update(collisionLayer, pad.rotation, pad.isDown ? 1 : 0);
+        players[i].update(collisionLayer, pad.rotation, pad.isDown ? 1 : 0, dt);
 
         if(playerId == i) {
             socket.emit('currentPosition', {id:playerId, x:player.entity.body.x, y:player.entity.body.y, isMoving:pad.isDown});
@@ -167,7 +168,6 @@ function update() {
         me.bringToTop();
     }
 
-    var dt = game.time.elapsed;
     var newFootprints = [];
     for(var j in footprints) {
         var footprint = footprints[j];

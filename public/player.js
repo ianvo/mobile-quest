@@ -8,6 +8,8 @@ var Player = function(context, name, isMe, x, y) {
     this.entity.animations.add('right', [144,145,146,147,148,149,150,151], 15, true);
     this.maxSpeed = 175;
     this.isMoving = false;
+    this.MAX_MESSAGE_LIFE = 4000;
+    this.messageLife = 0;
 
     game.physics.enable(this.entity, Phaser.Physics.ARCADE);
 
@@ -30,9 +32,21 @@ var Player = function(context, name, isMe, x, y) {
 };
 
 Player.prototype = {
+
+    setMessage: function(latestMessage) {
+        if(this.message != undefined) {
+            this.message.destroy();
+        }
+        this.message = game.add.text(this.entity.body.x, 0, latestMessage, { font: '11px Arial', fill: '#ffffff' });
+        this.messageLife = 0;
+    },
+
     remove: function() {
         this.entity.destroy();
         this.name.destroy();
+        if(this.message != undefined) {
+            this.message.destroy();
+        }
     },
 
     setTarget: function(x, y) {
@@ -51,7 +65,7 @@ Player.prototype = {
         this.entity.bringToTop();
     },
   
-    update: function(world, rotation, force) {
+    update: function(world, rotation, force, dt) {
         moving = force != 0;
 
         var currentPoint = new Phaser.Point(this.entity.body.x, this.entity.body.y); 
@@ -100,12 +114,24 @@ Player.prototype = {
         this.name.x = this.entity.body.x-((this.name.width-this.entity.body.width)/2);
         this.name.y = this.entity.body.y+this.entity.body.height;
 
+        if(this.message != undefined) {
+            this.messageLife += dt;
+            if(this.messageLife <= this.MAX_MESSAGE_LIFE) {
+                this.message.x = this.entity.body.x-((this.message.width-this.entity.body.width)/2);
+                this.message.y = this.entity.body.y;
+            }
+            else {
+                this.message.destroy();
+                this.message = undefined;
+            }
+        }
+
 
         var distanceTravelled = this.lastPosition.distance(currentPoint);
         this.distanceSinceLastFootstep += distanceTravelled;
         this.lastPosition = currentPoint;
         if(this.distanceSinceLastFootstep > 30) {
-            var footprintX = this.entity.body.x+    (this.entity.body.width/2);
+            var footprintX = this.entity.body.x+(this.entity.body.width/2);
             var footPrintY = this.entity.body.y+this.entity.body.height-15;
             footprints.push(new Footprint(this.game, footprintX, footPrintY, rotation));
             this.distanceSinceLastFootstep = 0;
