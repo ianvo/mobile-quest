@@ -53,6 +53,11 @@ var pad;
 var stick;
 var buttonA;
 var collisionLayer;
+var aboveLayer;
+var buildingsLayer;
+var objectsLayer;
+var flowersLayer;
+var baseLayer;
 
 var playerId = undefined;
 var players = {};
@@ -71,15 +76,18 @@ function create() {
     
     map = game.add.tilemap('map');
     map.addTilesetImage('tilesheet', 'tileset');
-    for(var i = 0; i < map.layers.length-1; i++) {
-        layer = map.createLayer(i);
-    }
-    collisionLayer = map.createLayer('no_walk');
+    
+    baseLayer = map.createLayer('base');
+    flowersLayer = map.createLayer('flowers');
+    objectsLayer = map.createLayer('objects');
+    buildingsLayer = map.createLayer('buildings');
+    aboveLayer = map.createLayer('above');
+    collisionLayer = map.createLayer('collisions');
     collisionLayer.alpha=0;
     game.physics.arcade.enable(collisionLayer);
     game.add.existing(collisionLayer);
     map.setCollisionByExclusion([0], true, collisionLayer);
-    layer.resizeWorld();
+    aboveLayer.resizeWorld();
 
     
     socket.emit('createPlayer', "me");
@@ -158,6 +166,7 @@ function update() {
         }
     }
     footprints = newFootprints;
+    aboveLayer.bringToTop();
 }
 
 function render() {
