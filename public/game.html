@@ -33,12 +33,19 @@
 var game = new Phaser.Game('100%', '100%', Phaser.CANVAS, 'phaser-example', { preload: preload, init:init, create: create, update: update, render: render });
 
 function preload() {
+    game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
+    game.scale.pageAlignHorizontally = true;
+    game.scale.pageAlignVertically = true;
+    game.scale.forceLandscape = true;
+    game.scale.parentIsWindow = true;
+    game.scale.refresh();
 
     //game.load.tilemap('map', 'catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
     //game.load.image('tiles', 'catastrophi_tiles_16.png');
     game.load.tilemap('map', 'world.json', null, Phaser.Tilemap.TILED_JSON);
     game.load.spritesheet('tileset', 'tilesheet.png',32,32);
     game.load.spritesheet('player', 'sprite_melee.png', 64, 64);
+    game.load.spritesheet('chat_button', 'chat_button.png', 134, 40);
     game.load.image('footprints', 'footprints.png');
     
     game.load.image('vjoy_base', 'base.png');
@@ -71,8 +78,6 @@ function init() {
 
 function create() {
 
-    pad = game.plugins.add(Phaser.Plugin.VJoy);
-    pad.inputEnable();
     
     map = game.add.tilemap('map');
     map.addTilesetImage('tilesheet', 'tileset');
@@ -89,9 +94,18 @@ function create() {
     map.setCollisionByExclusion([0], true, collisionLayer);
     aboveLayer.resizeWorld();
 
+    button = game.add.button(game.width - 200, game.height-75, 'chat_button', openChat, this, 0, 0, 1, 0);
+    button.fixedToCamera = true;
+
+    pad = game.plugins.add(Phaser.Plugin.VJoy);
+    pad.inputEnable(pad.settings.maxDistanceInPixels+20, game.height-(pad.settings.maxDistanceInPixels+20));
     
     socket.emit('createPlayer', "me");
 
+}
+
+function openChat() {
+    console.log("open chat");
 }
 
 socket.on('init', function(initPlayer){
@@ -167,6 +181,7 @@ function update() {
     }
     footprints = newFootprints;
     aboveLayer.bringToTop();
+    pad.bringToTop()
 }
 
 function render() {
