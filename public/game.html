@@ -67,6 +67,7 @@ var baseLayer;
 var playerId = undefined;
 var players = {};
 var footprints = [];
+var wasd;
 
 function init() {
     game.renderer.renderSession.roundPixels = true;
@@ -98,6 +99,13 @@ function create() {
     pad = game.plugins.add(Phaser.Plugin.VJoy);
     pad.inputEnable(pad.settings.maxDistanceInPixels+40, game.height-(pad.settings.maxDistanceInPixels+60));
     socket.emit('createPlayer', name);
+
+    wasd = {
+          up: game.input.keyboard.addKey(Phaser.Keyboard.W),
+          down: game.input.keyboard.addKey(Phaser.Keyboard.S),
+          left: game.input.keyboard.addKey(Phaser.Keyboard.A),
+          right: game.input.keyboard.addKey(Phaser.Keyboard.D),
+    };
 
 }
 
@@ -160,9 +168,44 @@ socket.on('updatePositions', function(updatePlayers) {
 function update() {
     var dt = game.time.elapsed;
     var me = undefined;
+    var rotation = pad.rotation;
+    var force = pad.isDown ? 1 : 0;
+    if(wasd.up.isDown) {
+        force = 1;
+        if(wasd.left.isDown) {
+            rotation = -Math.PI*3/4;
+        }
+        else if(wasd.right.isDown) {
+            rotation = -Math.PI/4;
+        }
+        else {
+            rotation = -Math.PI/2;
+        }
+    }
+    else if(wasd.down.isDown) {
+        force = 1;
+        if(wasd.left.isDown) {
+            rotation = Math.PI*3/4;
+        }   
+        else if (wasd.right.isDown) {
+            rotation = Math.PI/4;
+        }
+        else {
+            rotation = Math.PI/2;
+        }
+    }
+    else if (wasd.left.isDown) {
+        force = 1;
+        rotation = Math.PI;
+    }
+    else if (wasd.right.isDown) {
+        force = 1;
+        rotation = 0;
+    }
+
     for(var i in players) {
         player = players[i];
-        players[i].update(collisionLayer, pad.rotation, pad.isDown ? 1 : 0, dt);
+        players[i].update(collisionLayer, rotation, force, dt);
 
         if(playerId == i) {
             socket.emit('currentPosition', {x:player.entity.body.x, y:player.entity.body.y, isMoving:pad.isDown});
