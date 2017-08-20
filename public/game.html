@@ -6,11 +6,13 @@
         <title>Test Room</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-        <script src="socket.io.js"></script>
-        <script src="phaser.min.js" type="text/javascript"></script>
-        <script src="vjoy.js"></script>
-        <script src="footprints.js" type="text/javascript"></script>
-        <script src="player.js" type="text/javascript"></script>
+        <script src="js/socket.io.js"></script>
+        <script src="js/phaser.min.js" type="text/javascript"></script>
+        <script src="js/slick-ui.min.js"></script>
+        <script src="js/vjoy.js"></script>
+        <script src="js/footprints.js" type="text/javascript"></script>
+        <script src="js/character_creator.js"></script>
+        <script src="js/player.js" type="text/javascript"></script>
         <style>
             body {
                 margin: 0px;
@@ -28,27 +30,41 @@
         <script type="text/javascript">
 
         
-    var socket = io();
-    
-    var name = prompt("Enter your name", "Anon");
-    if(name) {
-        var game = new Phaser.Game('100%', '100%', Phaser.CANVAS, 'phaser-example', { preload: preload, init:init, create: create, update: update, render: render });
-    }
+var socket = io();
+
+var game;
+
+var slickUI;
+var game = new Phaser.Game('100%', '100%', Phaser.CANVAS, 'phaser-example', { preload: preload, init:init, create: create, update: update, render: render });
 
 
 function preload() {
-
+    slickUI = game.plugins.add(Phaser.Plugin.SlickUI);
+    slickUI.load('assets/ui/kenney/kenney.json');
     //game.load.tilemap('map', 'catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
     //game.load.image('tiles', 'catastrophi_tiles_16.png');
-    game.load.tilemap('map', 'world.json', null, Phaser.Tilemap.TILED_JSON);
-    game.load.spritesheet('tileset', 'tilesheet.png',32,32);
-    game.load.spritesheet('player', 'sprite_melee.png', 64, 64);
-    game.load.spritesheet('chat_button', 'chat_button.png', 134, 40);
-    game.load.image('footprints', 'footprints.png');
+    game.load.tilemap('map', 'assets/maps/world.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.spritesheet('tileset', 'assets/maps/tilesheet.png',32,32);
+
+
+    game.load.spritesheet('female_base', 'assets/sprites/female_base.png', 64, 64);
+    game.load.spritesheet('female_shirt', 'assets/sprites/female_shirt.png', 64, 64);
+    game.load.spritesheet('female_pants', 'assets/sprites/female_pants.png', 64, 64);
+    game.load.spritesheet('female_shoes', 'assets/sprites/female_shoes.png', 64, 64);
+    game.load.spritesheet('female_shoulderl', 'assets/sprites/hair/female_shoulderl.png', 64, 64);
+
+    game.load.spritesheet('male_base', 'assets/sprites/male_base.png', 64, 64);
+    game.load.spritesheet('male_shirt', 'assets/sprites/male_shirt.png', 64, 64);
+    game.load.spritesheet('male_pants', 'assets/sprites/male_pants.png', 64, 64);
+    game.load.spritesheet('male_shoes', 'assets/sprites/male_shoes.png', 64, 64);
+    game.load.spritesheet('male_shorthawk', 'assets/sprites/hair/male_shorthawk.png', 64, 64);
+    game.load.spritesheet('male_xlongknot', 'assets/sprites/hair/male_xlongknot.png', 64, 64);
+    game.load.spritesheet('chat_button', 'assets/chat_button.png', 134, 40);
+    game.load.image('footprints', 'assets/footprints.png');
     
-    game.load.image('vjoy_base', 'base.png');
-    game.load.image('vjoy_body', 'body.png');
-    game.load.image('vjoy_cap', 'cap.png');
+    game.load.image('vjoy_base', 'assets/joystick/base.png');
+    game.load.image('vjoy_body', 'assets/joystick/body.png');
+    game.load.image('vjoy_cap', 'assets/joystick/cap.png');
 
 }
 
@@ -68,6 +84,7 @@ var playerId = undefined;
 var players = {};
 var footprints = [];
 var wasd;
+var characterCreator;
 
 function init() {
     game.renderer.renderSession.roundPixels = true;
@@ -76,8 +93,15 @@ function init() {
 }
 
 function create() {
+    characterCreator = new CharacterCreator(game, function(newCharacter) 
+        {
+            characterCreator.destroy();
+            characterCreator = undefined;
+            enterGame(newCharacter);
+        });
+}
 
-    
+function enterGame(newCharacter) {
     map = game.add.tilemap('map');
     map.addTilesetImage('tilesheet', 'tileset');
     
@@ -98,7 +122,7 @@ function create() {
 
     pad = game.plugins.add(Phaser.Plugin.VJoy);
     pad.inputEnable(pad.settings.maxDistanceInPixels+40, game.height-(pad.settings.maxDistanceInPixels+60));
-    socket.emit('createPlayer', name);
+    socket.emit('createPlayer', newCharacter);
 
     wasd = {
           up: game.input.keyboard.addKey(Phaser.Keyboard.W),
@@ -106,7 +130,6 @@ function create() {
           left: game.input.keyboard.addKey(Phaser.Keyboard.A),
           right: game.input.keyboard.addKey(Phaser.Keyboard.D),
     };
-
 }
 
 function openChat() {
@@ -118,7 +141,7 @@ function openChat() {
 
 socket.on('init', function(initPlayer){
     playerId = initPlayer.id;
-    players[playerId] = new Player(game, initPlayer.n, true, initPlayer.x, initPlayer.y);
+    players[playerId] = new Player(game, initPlayer, true, initPlayer.x, initPlayer.y);
 });
 
 socket.on('allplayers', function(allPlayers){
@@ -127,14 +150,14 @@ socket.on('allplayers', function(allPlayers){
 
         if(playerId != i) {
             console.log(JSON.stringify(player));
-            players[i] = new Player(game, player.n, false, player.x, player.y);
+            players[i] = new Player(game, player, false, player.x, player.y);
         }
     }
 });
 
 socket.on('newPlayer', function(newPlayer){
     if(newPlayer.id != playerId) {
-        players[newPlayer.id] = new Player(game, newPlayer.n, false, newPlayer.x, newPlayer.y);
+        players[newPlayer.id] = new Player(game, newPlayer, false, newPlayer.x, newPlayer.y);
     }
 });
 
@@ -157,15 +180,18 @@ socket.on('updatePositions', function(updatePlayers) {
         var player = updatePlayers[i];
 
         if(playerId != i && players[i] != undefined) {
-            if(player.x != players[i].entity.body.x && player.y != players[i].entity.body.y) {
+            if(player.x != players[i].sprites[0].body.x || player.y != players[i].sprites[0].body.y) {
                 players[i].setTarget(player.x, player.y);
             }
-            players[i].isMoving = player.isMoving;
+            players[i].isMoving = player.m;
         }
     }
 });
 
 function update() {
+    if(characterCreator != undefined) {
+        return;
+    }
     var dt = game.time.elapsed;
     var me = undefined;
     var rotation = pad.rotation;
@@ -208,7 +234,7 @@ function update() {
         players[i].update(collisionLayer, rotation, force, dt);
 
         if(playerId == i) {
-            socket.emit('currentPosition', {x:player.entity.body.x, y:player.entity.body.y, isMoving:pad.isDown});
+            socket.emit('currentPosition', {x:player.sprites[0].body.x, y:player.sprites[0].body.y, isMoving:pad.isDown});
             me = player;
         }
         player.bringToTop();
@@ -232,6 +258,9 @@ function update() {
     footprints = newFootprints;
     aboveLayer.bringToTop();
     pad.bringToTop()
+    if(characterCreator != undefined) {
+        characterCreator.bringToTop();
+    }
 }
 
 function render() {

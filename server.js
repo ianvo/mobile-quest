@@ -14,20 +14,30 @@ app.get('/', function(req, res){
 app.use(express.static(__dirname + '/public'));
 
 var players = {};
+var updatedPositions = {};
 
 io.on('connection', function(socket){
-    console.log('new user: ' + socket.id);
+    //console.log('new user: ' + socket.id);
 
-    socket.on('createPlayer', function(playerName) {
+    socket.on('createPlayer', function(player) {
         //var player = new PlayerModule.Player(socket.id, playerInfo[0], false, Math.random()*3000, Math.random()*1500, '#'+Math.floor(Math.random()*16777215).toString(16), playerInfo[1]);
-        players[socket.id] = {id: socket.id, n:playerName, x:48, y:258, isMoving: false};
+        players[socket.id] = {id: socket.id, 
+                                n:player.n, 
+                                g:player.g,
+                                sk:player.sk,
+                                h:player.h,
+                                sh:player.sh,
+                                p:player.p,
+                                x:48, 
+                                y:258, 
+                                isMoving: false};
         socket.emit('init', players[socket.id]);
         socket.emit('allplayers', players);
         io.sockets.emit('newPlayer', players[socket.id]);
     });
 
     socket.on('disconnect', function(){
-      console.log('user disconnected: ' + socket.id);
+      //console.log('user disconnected: ' + socket.id);
       delete players[socket.id];
       io.sockets.emit('playerQuit', socket.id);
     });
@@ -38,6 +48,7 @@ io.on('connection', function(socket){
             players[socket.id].x = player.x;
             players[socket.id].y = player.y;
             players[socket.id].isMoving = player.isMoving;
+            updatedPositions[socket.id] = {x: player.x, y: player.y, m:player.isMoving};
         }
     });
 
@@ -54,7 +65,9 @@ function gameloop() {
     var dt = currentTime - prevTime;
     prevTime = currentTime;
 */
-    io.sockets.emit('updatePositions', players);
+    //console.log("updating: " + JSON.stringify(updatedPositions));
+    io.sockets.emit('updatePositions', updatedPositions);
+    updatedPositions = {};
     setTimeout(gameloop, 1000/20);
 }
 
