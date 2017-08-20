@@ -159,6 +159,9 @@ function valueToColor(value) {
 		r = 255;
 		g = Math.round(255-((value-5)*255));
 		b = 0;
+		if(g < 127) {
+			r = g*2;
+		}
 	}
 	return Phaser.Color.getColor(r, g, b);
 }
