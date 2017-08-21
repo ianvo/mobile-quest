@@ -233,7 +233,7 @@ function update() {
         player = players[i];
         players[i].update(collisionLayer, rotation, force, dt);
 
-        if(playerId == i) {
+        if(playerId == i && player.stateChanged) {
             socket.emit('currentPosition', {x:player.sprites[0].body.x, y:player.sprites[0].body.y, isMoving:pad.isDown});
             me = player;
         }

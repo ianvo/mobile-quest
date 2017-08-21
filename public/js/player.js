@@ -44,6 +44,7 @@ var Player = function(context, player, isMe, x, y) {
     this.distanceSinceLastFootstep = 0;
     
     this.name = game.add.text(x, y, player.n, { font: '11px Arial', fill: '#ffffff' });
+    this.stateChanged = false;
 
     if(this.isMe) {
       game.camera.follow(this.sprites[0]);
@@ -91,6 +92,7 @@ Player.prototype = {
     update: function(world, rotation, force, dt) {
         moving = force != 0;
 
+        this.stateChanged = false;
         var currentPoint = new Phaser.Point(this.sprites[0].body.x, this.sprites[0].body.y); 
         if(!this.isMe) {
           rotation = this.rotation;
@@ -109,6 +111,16 @@ Player.prototype = {
         }
         else {
           game.physics.arcade.collide(this.sprites[0], world);
+          if(force == 0) {
+              if(this.isMoving) {
+                  this.stateChanged = true;
+              }
+              this.isMoving = false;
+          }
+          else {
+              this.isMoving = true;
+              this.stateChanged = true;
+          }
         }
         this.sprites[0].body.velocity.set(0);
         if (force != 0)
