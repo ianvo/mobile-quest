@@ -54,23 +54,23 @@ var CharacterCreator = function(game, callback) {
     skeleton[1].alpha = 0;
 
 
-    this.panel.add(new SlickUI.Element.Text(16,90, "Skin: ")).text.alpha = 0.5;
-    var skinSlider = new SlickUI.Element.Slider(100,100, game.width - 150, skinValue);
+    this.panel.add(new SlickUI.Element.Text(16,50, "Skin: ")).text.alpha = 0.5;
+    var skinSlider = new SlickUI.Element.Slider(100,60, game.width - 150, skinValue);
     this.panel.add(skinSlider);
 
-    this.panel.add(new SlickUI.Element.Text(16,160, "Hair: ")).text.alpha = 0.5;
-    var hairSlider = new SlickUI.Element.Slider(100,170, game.width - 150, hairValue);
+    this.panel.add(new SlickUI.Element.Text(16,110, "Hair: ")).text.alpha = 0.5;
+    var hairSlider = new SlickUI.Element.Slider(100,120, game.width - 150, hairValue);
     this.panel.add(hairSlider);
 
-    this.panel.add(new SlickUI.Element.Text(16,230, "Shirt: ")).text.alpha = 0.5;
-    var shirtSlider = new SlickUI.Element.Slider(100,240, game.width - 150, shirtValue);
+    this.panel.add(new SlickUI.Element.Text(16,170, "Shirt: ")).text.alpha = 0.5;
+    var shirtSlider = new SlickUI.Element.Slider(100,180, game.width - 150, shirtValue);
     this.panel.add(shirtSlider);
 
-    this.panel.add(new SlickUI.Element.Text(16,300, "Pants: ")).text.alpha = 0.5;
-    var pantsSlider = new SlickUI.Element.Slider(100,310, game.width - 150, pantsValue);
+    this.panel.add(new SlickUI.Element.Text(16,230, "Pants: ")).text.alpha = 0.5;
+    var pantsSlider = new SlickUI.Element.Slider(100,240, game.width - 150, pantsValue);
     this.panel.add(pantsSlider);
 
-	this.panel.add(new SlickUI.Element.Text(10,350, "Body")).centerHorizontally().text.alpha = 0.5;
+	this.panel.add(new SlickUI.Element.Text(10,290, "Body")).centerHorizontally().text.alpha = 0.5;
 
     var multiplier = 2;
     smallHeight = female[0].height*.75;
@@ -82,7 +82,7 @@ var CharacterCreator = function(game, callback) {
     	female[i].height = largeHeight;
     	female[i].width = largeWidth;
     	female[i].anchor.setTo(0.5);
-    	this.panel.add(new SlickUI.Element.DisplayObject(this.panel.width / 2 - 200, 430, female[i]));
+    	this.panel.add(new SlickUI.Element.DisplayObject(this.panel.width / 2 - 100, 360, female[i]));
 
         female[i].animations.add('down', [131,132,133,134,135,136,137,138], 15, true);
         female[i].play('down');
@@ -92,7 +92,7 @@ var CharacterCreator = function(game, callback) {
     	male[i].anchor.setTo(0.5);
     	male[i].height = smallHeight;
     	male[i].width = smallWidth;
-    	this.panel.add(new SlickUI.Element.DisplayObject(this.panel.width / 2, 430, male[i]));
+    	this.panel.add(new SlickUI.Element.DisplayObject(this.panel.width / 2, 360, male[i]));
 
         male[i].animations.add('down', [131,132,133,134,135,136,137,138], 15, true);
     }
@@ -101,7 +101,7 @@ var CharacterCreator = function(game, callback) {
     	skeleton[i].anchor.setTo(0.5);
     	skeleton[i].height = smallHeight;
     	skeleton[i].width = smallWidth;
-    	this.panel.add(new SlickUI.Element.DisplayObject(this.panel.width / 2 + 200, 430, skeleton[i]));
+    	this.panel.add(new SlickUI.Element.DisplayObject(this.panel.width / 2 + 100, 360, skeleton[i]));
 
         skeleton[i].animations.add('down', [131,132,133,134,135,136,137,138], 15, true);
     }
@@ -162,7 +162,7 @@ var CharacterCreator = function(game, callback) {
     	startAnimations(skeleton, largeHeight, largeWidth);
     }, this);
 
-    this.panel.add(button = new SlickUI.Element.Button(game.width/2-60,550, 120, 50)).events.onInputUp.add(function () {
+    this.panel.add(button = new SlickUI.Element.Button(0,game.height-80, game.width, 50)).events.onInputUp.add(function () {
             callback({
 				b:bodyType,
 				n:"bleh",
