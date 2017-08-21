@@ -25,6 +25,7 @@ io.on('connection', function(socket){
         player.x = 48;
         player.y = 258;
         player.isMoving = false;
+        player.n = socket.id;
         players[socket.id] = player;
         socket.emit('init', players[socket.id]);
         socket.emit('allplayers', players);
