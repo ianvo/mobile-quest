@@ -167,7 +167,7 @@ Character.prototype = {
 };
 
 var CharacterCreator = function(game, callback) {
-    slickUI.add(this.panel = new SlickUI.Element.Panel(8, 8, game.width - 16, game.height - 16));
+    slickUI.add(this.panel = new SlickUI.Element.Panel(15, 15, game.width - 30, game.height - 30));
     this.panel.add(new SlickUI.Element.Text(10,10, "Style yourself!")).centerHorizontally().text.alpha = 0.5;
 
     var selected;
@@ -262,7 +262,7 @@ var CharacterCreator = function(game, callback) {
     	skeleton.tintPants(value);
     });
 
-    this.panel.add(button = new SlickUI.Element.Button(0,game.height-80, game.width, 50)).events.onInputUp.add(function () {
+    this.panel.add(button = new SlickUI.Element.Button(0,this.panel.height-50, this.panel.width, 50)).events.onInputUp.add(function () {
             callback(selected.toJSON());
         });
     button.add(new SlickUI.Element.Text(0,0, "Go!")).center();
