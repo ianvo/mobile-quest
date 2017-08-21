@@ -21,16 +21,11 @@ io.on('connection', function(socket){
 
     socket.on('createPlayer', function(player) {
         //var player = new PlayerModule.Player(socket.id, playerInfo[0], false, Math.random()*3000, Math.random()*1500, '#'+Math.floor(Math.random()*16777215).toString(16), playerInfo[1]);
-        players[socket.id] = {id: socket.id, 
-                                n:player.n, 
-                                b:player.b,
-                                sk:player.sk,
-                                h:player.h,
-                                sh:player.sh,
-                                p:player.p,
-                                x:48, 
-                                y:258, 
-                                isMoving: false};
+        player.id = socket.id;
+        player.x = 48;
+        player.y = 258;
+        player.isMoving = false;
+        players[socket.id] = player;
         socket.emit('init', players[socket.id]);
         socket.emit('allplayers', players);
         io.sockets.emit('newPlayer', players[socket.id]);

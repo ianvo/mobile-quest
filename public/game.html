@@ -47,18 +47,36 @@ function preload() {
     game.load.spritesheet('tileset', 'assets/maps/tilesheet.png',32,32);
 
 
-    game.load.spritesheet('female_base', 'assets/sprites/female_base.png', 64, 64);
-    game.load.spritesheet('female_shirt', 'assets/sprites/female_shirt.png', 64, 64);
-    game.load.spritesheet('female_pants', 'assets/sprites/female_pants.png', 64, 64);
-    game.load.spritesheet('female_shoes', 'assets/sprites/female_shoes.png', 64, 64);
-    game.load.spritesheet('female_shoulderl', 'assets/sprites/hair/female_shoulderl.png', 64, 64);
+    game.load.spritesheet('female_base',            'assets/sprites/female_base.png', 64, 64);
+    game.load.spritesheet('female_shirt',           'assets/sprites/female_shirt.png', 64, 64);
+    game.load.spritesheet('female_pants',           'assets/sprites/female_pants.png', 64, 64);
+    game.load.spritesheet('female_shoes',           'assets/sprites/female_shoes.png', 64, 64);
 
-    game.load.spritesheet('male_base', 'assets/sprites/male_base.png', 64, 64);
-    game.load.spritesheet('male_shirt', 'assets/sprites/male_shirt.png', 64, 64);
-    game.load.spritesheet('male_pants', 'assets/sprites/male_pants.png', 64, 64);
-    game.load.spritesheet('male_shoes', 'assets/sprites/male_shoes.png', 64, 64);
-    game.load.spritesheet('male_shorthawk', 'assets/sprites/hair/male_shorthawk.png', 64, 64);
-    game.load.spritesheet('male_xlongknot', 'assets/sprites/hair/male_xlongknot.png', 64, 64);
+    game.load.spritesheet('female_hair_shortbangs', 'assets/sprites/hair/female_shortbangs.png', 64, 64);
+    game.load.spritesheet('female_hair_loose',      'assets/sprites/hair/female_loose.png', 64, 64);
+    game.load.spritesheet('female_hair_longbangs',  'assets/sprites/hair/female_longbangs.png', 64, 64);
+    game.load.spritesheet('female_hair_pixie',      'assets/sprites/hair/female_pixie.png', 64, 64);
+    game.load.spritesheet('female_hair_ponytail',   'assets/sprites/hair/female_ponytail.png', 64, 64);
+    game.load.spritesheet('female_hair_bunches',    'assets/sprites/hair/female_bunches.png', 64, 64);
+    game.load.spritesheet('female_hair_princess',   'assets/sprites/hair/female_princess.png', 64, 64);
+    game.load.spritesheet('female_hair_shoulderl',  'assets/sprites/hair/female_shoulderl.png', 64, 64);
+    game.load.spritesheet('female_hair_swoop',      'assets/sprites/hair/female_swoop.png', 64, 64);
+
+    game.load.spritesheet('male_base',              'assets/sprites/male_base.png', 64, 64);
+    game.load.spritesheet('male_shirt',             'assets/sprites/male_shirt.png', 64, 64);
+    game.load.spritesheet('male_pants',             'assets/sprites/male_pants.png', 64, 64);
+    game.load.spritesheet('male_shoes',             'assets/sprites/male_shoes.png', 64, 64);
+
+    game.load.spritesheet('male_hair_plain',        'assets/sprites/hair/male_plain.png', 64, 64);
+    game.load.spritesheet('male_hair_bedhead',      'assets/sprites/hair/male_bedhead.png', 64, 64);
+    game.load.spritesheet('male_hair_long',         'assets/sprites/hair/male_long.png', 64, 64);
+    game.load.spritesheet('male_hair_messy1',       'assets/sprites/hair/male_messy1.png', 64, 64);
+    game.load.spritesheet('male_hair_messy2',       'assets/sprites/hair/male_messy2.png', 64, 64);
+    game.load.spritesheet('male_hair_mohawk',       'assets/sprites/hair/male_mohawk.png', 64, 64);
+    game.load.spritesheet('male_hair_page',         'assets/sprites/hair/male_page.png', 64, 64);
+    game.load.spritesheet('male_hair_parted',       'assets/sprites/hair/male_parted.png', 64, 64);
+    game.load.spritesheet('male_hair_shorthawk',    'assets/sprites/hair/male_shorthawk.png', 64, 64);
+    game.load.spritesheet('male_hair_xlongknot',    'assets/sprites/hair/male_xlongknot.png', 64, 64);
 
 
     game.load.spritesheet('skeleton_base', 'assets/sprites/skeleton.png', 64, 64);
@@ -153,7 +171,6 @@ socket.on('allplayers', function(allPlayers){
         var player = allPlayers[i];
 
         if(playerId != i) {
-            console.log(JSON.stringify(player));
             players[i] = new Player(game, player, false, player.x, player.y);
         }
     }
@@ -179,7 +196,6 @@ socket.on('message', function(message) {
 });
 
 socket.on('updatePositions', function(updatePlayers) {
-    //console.log(JSON.stringify(updatePlayers));
     for(var i in updatePlayers) {
         var player = updatePlayers[i];
 

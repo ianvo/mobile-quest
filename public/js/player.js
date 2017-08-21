@@ -6,21 +6,21 @@ var Player = function(context, player, isMe, x, y) {
         this.sprites.push(game.add.sprite(x, y, 'female_base', 131));
         this.sprites.push(game.add.sprite(x, y, 'female_shoes', 131));
         this.sprites.push(game.add.sprite(x, y, 'female_pants', 131));
-        this.sprites.push(game.add.sprite(x, y, 'female_shoulderl', 131));
+        this.sprites.push(game.add.sprite(x, y, femaleHair[player.ht], 131));
         this.sprites.push(game.add.sprite(x, y, 'female_shirt', 131));
     }
     else if(player.b == 1) {
         this.sprites.push(game.add.sprite(x, y, 'male_base', 131));
         this.sprites.push(game.add.sprite(x, y, 'male_shoes', 131));
         this.sprites.push(game.add.sprite(x, y, 'male_pants', 131));
-        this.sprites.push(game.add.sprite(x, y, 'male_xlongknot', 131));
+        this.sprites.push(game.add.sprite(x, y, maleHair[player.ht], 131));
         this.sprites.push(game.add.sprite(x, y, 'male_shirt', 131));
     }
     else {
         this.sprites.push(game.add.sprite(x, y, 'skeleton_base', 131));
         this.sprites.push(game.add.sprite(x, y, 'male_shoes', 131));
         this.sprites.push(game.add.sprite(x, y, 'male_pants', 131));
-        this.sprites.push(game.add.sprite(x, y, 'male_xlongknot', 131));
+        this.sprites.push(game.add.sprite(x, y, maleHair[player.ht], 131));
         this.sprites.push(game.add.sprite(x, y, 'male_shirt', 131));
         this.sprites[1].alpha = 0;
         this.sprites[4].alpha = 0;
