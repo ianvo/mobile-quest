@@ -23,7 +23,7 @@ io.on('connection', function(socket){
         //var player = new PlayerModule.Player(socket.id, playerInfo[0], false, Math.random()*3000, Math.random()*1500, '#'+Math.floor(Math.random()*16777215).toString(16), playerInfo[1]);
         players[socket.id] = {id: socket.id, 
                                 n:player.n, 
-                                g:player.g,
+                                b:player.b,
                                 sk:player.sk,
                                 h:player.h,
                                 sh:player.sh,
