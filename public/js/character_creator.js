@@ -72,6 +72,7 @@ var Character = function(panel, bodyType, skinTint, hairTint, shirtTint, pantsTi
         this.sprites[i].animations.add('down', [131,132,133,134,135,136,137,138], 15, true);
     }
 
+    this.hairIndex = Math.floor(Math.random() * this.hair.length);
     for(var i in this.hair) {
     	this.hair[i].height = this.smallSize;
     	this.hair[i].width = this.smallSize;
@@ -79,7 +80,10 @@ var Character = function(panel, bodyType, skinTint, hairTint, shirtTint, pantsTi
     	panel.add(new SlickUI.Element.DisplayObject(panel.width/2, panel.height/2-5, this.hair[i]));
 
         this.hair[i].animations.add('down', [131,132,133,134,135,136,137,138], 15, true);
-        if(i > 0) {
+        if(i == this.hairIndex) {
+        	this.hair[i].alpha = 1;
+        }
+        else {
         	this.hair[i].alpha = 0;
         }
     }

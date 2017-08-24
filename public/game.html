@@ -260,10 +260,6 @@ function update() {
         player.bringToTop();
     }
 
-    if(me != undefined) {
-        me.bringToTop();
-    }
-
     var newFootprints = [];
     for(var j in footprints) {
         var footprint = footprints[j];
@@ -276,8 +272,12 @@ function update() {
         }
     }
     footprints = newFootprints;
+    if(me != undefined) {
+        me.bringToTop();
+    }
     aboveLayer.bringToTop();
     pad.bringToTop()
+
     if(characterCreator != undefined) {
         characterCreator.bringToTop();
     }
