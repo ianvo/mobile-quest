@@ -1,6 +1,7 @@
 var Player = function(context, player, isMe, x, y) {
     this.game = context;
     this.isMe = isMe;
+    this.isSelected = false;
     this.sprites = [];
     if(player.b == 0) {
         this.sprites.push(game.add.sprite(x, y, 'female_base', 131));
@@ -40,6 +41,8 @@ var Player = function(context, player, isMe, x, y) {
         this.sprites[i].body.collideWorldBounds = true;
     }
 
+    this.sprites[0].inputEnabled = true;
+
     this.maxSpeed = 175;
     this.isMoving = false;
     this.MAX_MESSAGE_LIFE = 4000;
@@ -52,7 +55,12 @@ var Player = function(context, player, isMe, x, y) {
     this.lastPosition = this.startPoint;
     this.distanceSinceLastFootstep = 0;
     
-    this.name = game.add.text(x, y, player.n, { font: '11px Arial', fill: '#ffffff' });
+    this.name = game.add.text(x, y, player.n);
+    this.name.font = 'Slackey';
+    this.name.fill = this.isMe ? "#00ff00" : "#ffffff";
+    this.name.fontSize = 13;
+    this.name.stroke = '#000000';
+    this.name.strokeThickness = 3;
     this.stateChanged = false;
 
     if(this.isMe) {
@@ -62,11 +70,14 @@ var Player = function(context, player, isMe, x, y) {
 
 Player.prototype = {
 
+    setSelected: function(selected) {
+        this.isSelected = selected;
+    },
     setMessage: function(latestMessage) {
         if(this.message != undefined) {
             this.message.destroy();
         }
-        this.message = game.add.text(this.sprites[0].body.x, 0, latestMessage, { font: '11px Arial', fill: '#ffffff' });
+        this.message = game.add.text(this.sprites[0].body.x, 0, latestMessage, { font: '11px Press Start 2P', fill: '#ffffff' });
         this.messageLife = 0;
     },
 
@@ -117,6 +128,15 @@ Player.prototype = {
             this.sprites[0].body.y = this.targetPoint.y;
           }
           this.remainderDistance = newRemainderDistance;
+
+            if(this.isSelected) {
+                this.name.stroke = '#00ff00';
+                this.name.strokeThickness = 3;
+            }
+            else {
+                this.name.stroke = '#000000';
+                this.name.strokeThickness = 3;
+            }
         }
         else {
           game.physics.arcade.collide(this.sprites[0], world);

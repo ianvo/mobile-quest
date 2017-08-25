@@ -36,9 +36,23 @@ var game;
 
 var slickUI;
 var game = new Phaser.Game('100%', '100%', Phaser.CANVAS, 'phaser-example', { preload: preload, init:init, create: create, update: update, render: render });
+//  The Google WebFont Loader will look for this object, so create it before loading the script.
+WebFontConfig = {
 
+    //  'active' means all requested fonts have finished loading
+    //  We set a 1 second delay before calling 'createText'.
+    //  For some reason if we don't the browser cannot render the text the first time it's created.
+    active: function() { },
+
+    //  The Google Fonts we want to load (specify as many as you like in the array)
+    google: {
+      families: ['Slackey']
+    }
+
+};
 
 function preload() {
+    game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
     slickUI = game.plugins.add(Phaser.Plugin.SlickUI);
     slickUI.load('assets/ui/kenney/kenney.json');
     //game.load.tilemap('map', 'catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
@@ -107,6 +121,7 @@ var players = {};
 var footprints = [];
 var wasd;
 var characterCreator;
+var previouslySelectedPlayer = undefined;
 
 function init() {
     game.renderer.renderSession.roundPixels = true;
@@ -172,6 +187,7 @@ socket.on('allplayers', function(allPlayers){
 
         if(playerId != i) {
             players[i] = new Player(game, player, false, player.x, player.y);
+            players[i].sprites[0].events.onInputDown.add(getOnPlayerClicked(i), this);
         }
     }
 });
@@ -179,8 +195,20 @@ socket.on('allplayers', function(allPlayers){
 socket.on('newPlayer', function(newPlayer){
     if(newPlayer.id != playerId) {
         players[newPlayer.id] = new Player(game, newPlayer, false, newPlayer.x, newPlayer.y);
+        players[newPlayer.id].sprites[0].events.onInputDown.add(getOnPlayerClicked(newPlayer.id), this);
     }
 });
+
+function getOnPlayerClicked(player) {
+    return function(){
+                console.log(player);
+                if(previouslySelectedPlayer != undefined) {
+                    previouslySelectedPlayer.setSelected(false);
+                }
+                previouslySelectedPlayer = players[player];
+                previouslySelectedPlayer.setSelected(true);
+            };
+}
 
 socket.on('playerQuit', function(player) {
     if(players[player] != undefined) {
