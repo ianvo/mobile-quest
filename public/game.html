@@ -122,6 +122,7 @@ var footprints = [];
 var wasd;
 var characterCreator;
 var previouslySelectedPlayer = undefined;
+var playerMenu;
 
 function init() {
     game.renderer.renderSession.roundPixels = true;
@@ -159,7 +160,6 @@ function enterGame(newCharacter) {
 
     pad = game.plugins.add(Phaser.Plugin.VJoy);
     pad.inputEnable(pad.settings.maxDistanceInPixels+40, game.height-(pad.settings.maxDistanceInPixels+60));
-    socket.emit('createPlayer', newCharacter);
 
     wasd = {
           up: game.input.keyboard.addKey(Phaser.Keyboard.W),
@@ -167,6 +167,61 @@ function enterGame(newCharacter) {
           left: game.input.keyboard.addKey(Phaser.Keyboard.A),
           right: game.input.keyboard.addKey(Phaser.Keyboard.D),
     };
+
+
+    socket = io();
+
+    socket.on('init', function(initPlayer){
+        playerId = initPlayer.id;
+        players[playerId] = new Player(game, initPlayer, true, initPlayer.x, initPlayer.y);
+    });
+
+    socket.on('allplayers', function(allPlayers){
+        for(var i in allPlayers) {
+            var player = allPlayers[i];
+
+            if(playerId != i) {
+                players[i] = new Player(game, player, false, player.x, player.y);
+                players[i].sprites[0].events.onInputDown.add(getOnPlayerClicked(i), this);
+            }
+        }
+    });
+
+    socket.on('newPlayer', function(newPlayer){
+        if(newPlayer.id != playerId) {
+            players[newPlayer.id] = new Player(game, newPlayer, false, newPlayer.x, newPlayer.y);
+            players[newPlayer.id].sprites[0].events.onInputDown.add(getOnPlayerClicked(newPlayer.id), this);
+        }
+    });
+
+    socket.on('playerQuit', function(player) {
+        if(players[player] != undefined) {
+            players[player].remove();
+            delete players[player];
+        }
+    });
+
+    socket.on('message', function(message) {
+        if(players[message.id] != undefined) {
+            players[message.id].setMessage(message.m);
+        }
+    });
+
+    socket.on('updatePositions', function(updatePlayers) {
+        for(var i in updatePlayers) {
+            var player = updatePlayers[i];
+
+            if(playerId != i && players[i] != undefined) {
+                if(player.x != players[i].sprites[0].body.x || player.y != players[i].sprites[0].body.y) {
+                    players[i].setTarget(player.x, player.y);
+                }
+                players[i].isMoving = player.m;
+            }
+        }
+    });
+
+
+    socket.emit('createPlayer', newCharacter);
 }
 
 function openChat() {
@@ -176,28 +231,7 @@ function openChat() {
     }
 }
 
-socket.on('init', function(initPlayer){
-    playerId = initPlayer.id;
-    players[playerId] = new Player(game, initPlayer, true, initPlayer.x, initPlayer.y);
-});
 
-socket.on('allplayers', function(allPlayers){
-    for(var i in allPlayers) {
-        var player = allPlayers[i];
-
-        if(playerId != i) {
-            players[i] = new Player(game, player, false, player.x, player.y);
-            players[i].sprites[0].events.onInputDown.add(getOnPlayerClicked(i), this);
-        }
-    }
-});
-
-socket.on('newPlayer', function(newPlayer){
-    if(newPlayer.id != playerId) {
-        players[newPlayer.id] = new Player(game, newPlayer, false, newPlayer.x, newPlayer.y);
-        players[newPlayer.id].sprites[0].events.onInputDown.add(getOnPlayerClicked(newPlayer.id), this);
-    }
-});
 
 function getOnPlayerClicked(player) {
     return function(){
@@ -210,31 +244,7 @@ function getOnPlayerClicked(player) {
             };
 }
 
-socket.on('playerQuit', function(player) {
-    if(players[player] != undefined) {
-        players[player].remove();
-        delete players[player];
-    }
-});
 
-socket.on('message', function(message) {
-    if(players[message.id] != undefined) {
-        players[message.id].setMessage(message.m);
-    }
-});
-
-socket.on('updatePositions', function(updatePlayers) {
-    for(var i in updatePlayers) {
-        var player = updatePlayers[i];
-
-        if(playerId != i && players[i] != undefined) {
-            if(player.x != players[i].sprites[0].body.x || player.y != players[i].sprites[0].body.y) {
-                players[i].setTarget(player.x, player.y);
-            }
-            players[i].isMoving = player.m;
-        }
-    }
-});
 
 function update() {
     if(characterCreator != undefined) {
@@ -308,6 +318,10 @@ function update() {
 
     if(characterCreator != undefined) {
         characterCreator.bringToTop();
+    }
+
+    if(playerMenu != undefined) {
+        playerMenu.bringToTop();
     }
 }
 
