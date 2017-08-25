@@ -77,7 +77,7 @@ Player.prototype = {
         if(this.message != undefined) {
             this.message.destroy();
         }
-        this.message = game.add.text(this.sprites[0].body.x, 0, " " + latestMessage.trim() + " ", { font: "16px Walter Turncoat", fill: '#ffffff', backgroundColor: 'rgba(0,0,0,0.75)' });
+        this.message = game.add.text(this.sprites[0].body.x, 0, " " + latestMessage.trim() + " ", { font: "16px Walter Turncoat", fill: '#ffffff', backgroundColor: 'rgba(0,0,0,0.5)' });
         this.messageLife = 0;
     },
 
