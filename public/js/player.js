@@ -45,7 +45,7 @@ var Player = function(context, player, isMe, x, y) {
 
     this.maxSpeed = 175;
     this.isMoving = false;
-    this.MAX_MESSAGE_LIFE = 4000;
+    this.MAX_MESSAGE_LIFE = 8000;
     this.messageLife = 0;
     
     this.startPoint = new Phaser.Point(x, y);
@@ -77,7 +77,7 @@ Player.prototype = {
         if(this.message != undefined) {
             this.message.destroy();
         }
-        this.message = game.add.text(this.sprites[0].body.x, 0, latestMessage, { font: '11px Press Start 2P', fill: '#ffffff' });
+        this.message = game.add.text(this.sprites[0].body.x, 0, " " + latestMessage.trim() + " ", { font: "16px Walter Turncoat", fill: '#ffffff', backgroundColor: 'rgba(0,0,0,0.75)' });
         this.messageLife = 0;
     },
 
@@ -104,6 +104,9 @@ Player.prototype = {
 
     bringToTop: function() {
         this.name.bringToTop();
+        if(this.message != undefined) {
+            this.message.bringToTop();
+        }
         for(var i in this.sprites) {
             this.sprites[i].bringToTop();
         }
@@ -196,7 +199,7 @@ Player.prototype = {
             this.messageLife += dt;
             if(this.messageLife <= this.MAX_MESSAGE_LIFE) {
                 this.message.x = this.sprites[0].body.x-((this.message.width-this.sprites[0].body.width)/2);
-                this.message.y = this.sprites[0].body.y;
+                this.message.y = this.sprites[0].body.y-20;
             }
             else {
                 this.message.destroy();
