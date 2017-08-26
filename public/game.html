@@ -123,6 +123,7 @@ var wasd;
 var characterCreator;
 var previouslySelectedPlayer = undefined;
 var playerMenu;
+var chatButton;
 
 function init() {
     game.renderer.renderSession.roundPixels = true;
@@ -155,8 +156,8 @@ function enterGame(newCharacter) {
     map.setCollisionByExclusion([0], true, collisionLayer);
     aboveLayer.resizeWorld();
 
-    button = game.add.button(game.width - 150, game.height-130, 'chat_button', openChat, this, 0, 0, 1, 0);
-    button.fixedToCamera = true;
+    chatButton = game.add.button(game.width - 150, game.height-130, 'chat_button', openChat, this, 0, 0, 1, 0);
+    chatButton.fixedToCamera = true;
 
     pad = game.plugins.add(Phaser.Plugin.VJoy);
     pad.inputEnable(pad.settings.maxDistanceInPixels+40, game.height-(pad.settings.maxDistanceInPixels+60));
@@ -314,7 +315,6 @@ function update() {
         me.bringToTop();
     }
     aboveLayer.bringToTop();
-    pad.bringToTop()
 
     if(characterCreator != undefined) {
         characterCreator.bringToTop();
@@ -323,6 +323,8 @@ function update() {
     if(playerMenu != undefined) {
         playerMenu.bringToTop();
     }
+    pad.bringToTop();
+    chatButton.bringToTop();
 }
 
 function render() {
